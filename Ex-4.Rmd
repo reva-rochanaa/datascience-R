@@ -1,0 +1,203 @@
+---
+title: "Exercise 4 - Histograms and Boxplots using R and Data Visualization in R"
+author: "D.S.Sruthi  (21BCS155)"
+date: "2024-02-09"
+output:
+  pdf_document: default
+  word_document: default
+geometry: left=0.75in,right=0.5in,top=0.5in,bottom=0.5in
+fontsize: 10pt
+spacing: single
+fig_caption: true
+indent: true
+vspace: "-1cm"
+---
+```{r setup, include=FALSE}
+options(repos = c(CRAN = "https://cran.rstudio.com"))
+knitr::opts_chunk$set(echo = TRUE, message = TRUE)
+knitr::opts_chunk$set(fig.width=3, fig.height=3, fig.align = "left")
+```
+```{r}
+data(iris)
+install.packages("MASS")
+library(MASS)
+install.packages("ggplot2")
+library(ggplot2)
+#1.Extract the maximum information from a Histogram and Boxplot.
+      b<-subset(iris,select=-c(Species))
+      b<-boxplot(b,ylim=c(0,10),main="Boxplot for IRIS")
+      text(x=1,y=8.2,paste(max(iris$Sepal.Length),"(max)"))
+      text(x=2,y=4.4,paste(max(iris$Sepal.Width),"(max)"))
+      text(x=3,y=7.2,paste(max(iris$Petal.Length),"(max)"))
+      text(x=4,y=3,paste(max(iris$Petal.Width),"(max)"))
+      list_histo=hist(iris$Sepal.Length,breaks=length(iris$Sepal.Length),freq=TRUE)
+      l<-list_histo$breaks
+      m<-list_histo$counts
+      l1<-length(l)
+      for(i in 1:l1){
+          if(paste(list_histo$counts[i+0])!=0){
+          text(x=list_histo$breaks[i],y=list_histo$counts[i]+1,paste(list_histo$counts[i]))
+        }
+      }
+#2. Consider the iris dataset, import the pyplot interface from matplotlib under the alias plt.
+    #create a new variable called boxplot_data that excludes the species column.
+          boxplot_data<-subset(iris,select=-c(Species))
+          boxplot(boxplot_data)
+#3. Create histograms and Illustrate the distribution look like 
+    #within the petalLength feature of the Iris data set
+          hist(iris$Petal.Length,main="Histogram for petal Length",
+               xlab="Petal Length in cm")
+
+#4. Create histograms that plot multiple features at once for any dataset.
+      hist(iris$Petal.Length,col="green",main="Histogram for IRIS",
+           xlab="Features if IRIS")
+      hist(iris$Petal.Width,col="pink",add=TRUE)
+#5. Plot every feature from the Iris data set 
+    #(excluding species, since it is non-numerical) in a histogram.
+      hist(iris$Petal.Length,col="blue")
+      hist(iris$Petal.Width,col="yellow",add=TRUE)
+      hist(iris$Sepal.Length,col="red",add=TRUE)
+      hist(iris$Sepal.Width,col="orange",add=TRUE)
+#6.Consider a Titanic dataset and compare metric values across 
+    #different subgroups of the data. Also assume you have a greater 
+    #number of groups, which visualization method do you prefer
+    #over a column chart?
+      install.packages("readr")
+      library(readr)
+      Titanic<-read.csv("C:\\Users\\Sruthi\\Downloads\\Data Science\\Titanic.csv")
+      boxplot(Fare ~ Pclass,data=Titanic,main="Boxplot of Titanic Fare by Passenger class",
+              xlab="Passanger class",ylab="Fare")
+#7.Consider the given dataset and plot the different charts.
+      library(ggplot2)
+      df<-data.frame(
+        EMPID=paste0("EMP",1:10),
+        Gender=c("M","F","F","M","F","M","M","F","M","M"),
+        Age=c(34,40,37,30,44,36,32,26,32,36),
+        Sales=c(123,114,135,139,117,121,133,140,133,133),
+        BMI=c("Normal","OverWeight","Obesity","UnderWeight",
+              "UnderWeight","Normal","Obesity","Normal","Normal","UnderWeight"),
+        Income=c(350,450,169,189,183,80,166,120,75,40)
+        )
+      ggplot(df,aes(x=Gender)) +
+        geom_bar()+ggtitle("Gender Distribution - Bar Chart")
+      #Create Histogram:
+      ggplot(df,aes(x=Age)) +
+        geom_histogram()+ggtitle("Age Distribution - Histogram")
+      #Create Scatterplot:
+      ggplot(df,aes(x=Sales,y=BMI)) +
+        geom_point()+ggtitle("Sales vs BMI - ScatterPlot")
+      #Create Boxplot:
+      ggplot(df,aes(x=Gender,y=Income)) +
+        geom_boxplot()+ggtitle("Gender vs Income - BoxPlot")
+#8)Consider the above dataset and draw the box plot for the statistical data 
+    #based on the minimum, first quartile, median, third quartile, and maximum.
+      library(ggplot2)
+      b<-subset(df,select=c(-EMPID,-Gender,-BMI))
+      b<-boxplot(b,ylim=c(0,40),main="Boxplot for IRIS",xlab="Features",ylab="Frequency")
+      b
+      text(x=1,y=80,paste(max(df$Age),"(max)"))
+      text(x=2,y=180,paste(max(df$Sales),"(max)"))
+      text(x=3,y=380,paste(max(df$Income),"(max)"))
+      text(x=1,y=9,paste(min(df$Age),"(min)"))
+      text(x=2,y=5,paste(min(df$Sales),"(min)"))
+      text(x=3,y=8,paste(min(df$Income),"(min)"))
+      text(x=1,y=60,paste(median(df$Age),"(median)"))
+      text(x=2,y=160,paste(median(df$Sales),"(median)"))
+      text(x=3,y=360,paste(median(df$Income),"(median)"))
+      text(x=1,y=100,paste(quantile(df$Age,0.25),"(First Quantile)"))
+      text(x=2,y=200,paste(quantile(df$Sales,0.25),"(First Quantile)"))
+      text(x=3,y=400,paste(quantile(df$Income,0.25),"(First Quantile)"))
+      text(x=1,y=120,paste(quantile(df$Age,0.75),"(Third Quantile)"))
+      text(x=2,y=220,paste(quantile(df$Sales,0.75),"(Third Quantile)"))
+      text(x=3,y=340,paste(quantile(df$Income,0.75),"(Third Quantile)"))
+#9)Make a scatterplot for the features in the Iris dataset.
+      library(ggplot2)
+      install.packages("datasets")
+      library(datasets)
+      feature<-iris$Petal.Length
+      ggplot(iris,aes(x=1:nrow(iris),y=feature)) +
+        geom_point() +
+        xlab("Sample") +
+        ylab("Petals Length(cm)") +
+        ggtitle("Iris Dataset - Petal Length")
+#10)Look at an individual feature in Seaborn through a boxplot.    
+      library(ggplot2)
+      library(datasets)
+      feature<-iris$Petal.Length
+      ggplot(iris,aes(y=feature)) +
+        geom_boxplot() +
+        xlab("Count") +
+        ylab("Petals Length(cm)") +
+        ggtitle("Iris Dataset - Petal Length")
+#BATCH 5
+      #Create a synthetic dataset of 100 entries (randomly generated) with the following fields and store it
+      #in a .csv file:
+      #Variable Data Type Description
+      #StaffId Numeric Id of Staff in an organisation
+      #Dept Factor Department of Staff (Sales, Production, etc)
+      #Year Numeric Year (2021, 2022, 2023 and 2024)
+      #Month Factor Month (Jan, Feb, etc)
+      #Salary Numeric Salary of Staff
+
+    library(dplyr)
+    set.seed(123)
+    num_entries <- 100
+    staff_data <- tibble(
+      StaffId = seq(1, num_entries),
+      Dept = sample(c("Sales", "Production", "Marketing", "HR"), num_entries, replace = TRUE),
+      Year = sample(2021:2024, num_entries, replace = TRUE),
+      Month = sample(month.abb, num_entries, replace = TRUE),
+      Salary = round(runif(num_entries, min = 30000, max = 80000), 2)
+  )
+  write.csv(staff_data, "staff_data.csv", row.names = FALSE)
+  head(staff_data,5)
+
+#1)Scatterplot with smooth curve for every Year with different pattern Sized points for every Year
+  library(ggplot2)
+  scatterplot <- ggplot(staff_data, aes(x = Month, y = Salary, color = as.factor(Year), size = Year)) +
+  geom_point(mapping=aes(x=Year,y=Salary)) + 
+    geom_point(mapping=aes(x=Year,y=Salary,size=Year))
+  print(scatterplot)
+  
+#2)Draw subplots of scatterplot for each department to plot year-wise Salary (sum of each month).
+  library(ggplot2)
+  summed_data <- staff_data %>%
+  group_by(Dept, Year) %>%
+  summarise(Total_Salary = sum(Salary))
+  scatterplots <- ggplot(summed_data, aes(x = Year, y = Total_Salary, color = as.factor(Year), size = Year)) +
+  geom_point(mapping=aes(x=Year,y=Total_Salary)) +  # Add points
+  facet_wrap(~ Dept)  # Create subplots for each department
+  print(scatterplots)
+  
+#3)Bar chart specification to find proportion of staff in each department with different colours for bar boundary.
+      library(ggplot2)
+      staff_data <- read.csv("staff_data.csv")
+      ggplot(staff_data, aes(x = factor(Year), y = ..count.., fill = Dept)) +
+        geom_bar(position = "stack") +
+        labs(title = "Department-wise Year-wise Count",
+        x = "Year",
+        y = "Count")
+
+#4)Identify the outlier’s using boxplot.
+  library(ggplot2)
+    boxplot <- ggplot(staff_data, aes(x = Dept, y = Salary)) +
+    geom_boxplot() +  # Create a boxplot
+    xlab("Department") +  # X-axis label
+    ylab("Salary") +  # Y-axis label
+    ggtitle("Boxplot of Salary by Department")  # Title
+    print(boxplot)
+
+#5)Draw histograms for count of Salary with different bin width & zoom to see any one region.
+  library(ggplot2)
+  histograms <- ggplot(staff_data, aes(x = Salary)) +
+  geom_histogram(binwidth = 1000, fill = "blue", color = "black", alpha = 0.7) +  # Histogram with bin width of 1000
+  geom_histogram(binwidth = 500, fill = "red", color = "black", alpha = 0.7) +   # Histogram with bin width of 500
+  geom_histogram(binwidth = 200, fill = "green", color = "black", alpha = 0.7) +  # Histogram with bin width of 200
+  xlab("Salary") +  # X-axis label
+  ylab("Count") +  # Y-axis label
+  ggtitle("Histograms of Salary with Different Bin Widths")  # Title
+  print(histograms)
+```
+
+## R Markdown
+
