@@ -1,0 +1,209 @@
+---
+title: "Exercise 3 - Data manipulation using R"
+author: 'K.Sharanya - 21BCS152'
+date: "2024-01-05"
+output:
+  word_document: default
+  pdf_document: default
+geometry: left=0.75in,right=0.5in,top=0.5in,bottom=0.5in
+fontsize: 10pt
+spacing: single
+fig_caption: true
+indent: true
+vspace: "-1cm"
+---
+```{r setup, include=FALSE}
+options(repos = c(CRAN = "https://cran.rstudio.com"))
+knitr::opts_chunk$set(echo = TRUE, message = TRUE)
+knitr::opts_chunk$set(fig.width=3, fig.height=3, fig.align = "left")
+```
+```{r}
+#1)Use help and read in data from "Gcsemv.txt".The dat acontains GCSE exam scores on a science subject . Two components of the exam were chosen as outcome variables:written paper and course work.There are 1.905 students from 73 schools in England.Five fields are as follows.Missing values are coded as -1.
+
+  #a)Read the data , give its summary and give appropriate names to columns and handle missing values.
+
+    install.packages("mlmRev")
+    data(Gcsemv,package="mlmRev")
+    df<-read.delim("C:\\Users\\shara\\Desktop\\DS lab\\Gcsemv.txt")
+    head(df,6)
+
+    install.packages("mlmRev")
+    library(mlmRev)
+    data(Gcsemv)
+    df<-Gcsemv
+    View(df)
+
+    colnames(df)<-c("School id","Student id","Gender","Written_Score","Course_Work")
+    summary(df)
+
+    install.packages("dplyr")
+    library(dplyr)
+    updated_df<-subset(df,df$Written_Score!=-1 & df$Course_Work!=-1)
+    head(updated_df,3)
+    
+  #b)Some of the variables read in as numberic are actually categorical variables.Convert them accordingly.
+
+    library(dplyr)
+    df<-arrange(updated_df,'Student id')
+    View(df)
+
+    updated_df['Gender']<-as.factor(ifelse(updated_df$Gender==0,"M","F"))
+    head(updated_df,3)
+
+#Write R script 
+    #a)Filter only 2016 data and select columns for country, life expectancy, income group, and region and save it as longevity.
+
+    library(readr)
+    library(dplyr)
+    library(ggplot2)
+    nations <- read.csv("C:\\Users\\shara\\Desktop\\DS lab\\nations.csv")
+
+    y_2016<-filter(nations,nations$year==2016)
+    y_2016<-subset(y_2016,select=c(country,life_expect,income,region))
+    y_2016
+
+    df1<-y_2016 %>% filter(income=="High income") %>% arrange(life_expect) %>% head(10)
+    df1
+
+#b)Find the countries in NOrth America or Europe & Central Asia with life expectancy in 2016 of 75-80
+
+    l<-y_2016 %>% filter(region == "North America" | region == "Europe & Central Asia", life_expect > 75 & life_expect < 80)
+    l
+
+#c)Find the 20 countries with the longest life expectancy , plus the United States with its rank, if it lies outside the top 20.
+
+    top<-l %>% mutate(rank_l = rank(desc(life_expect))) %>% arrange(rank_l) %>% filter(rank_l <=20 | country=="United States")
+    top
+
+#d)Calculate the total GDPby income group and year and save it as a feature. Sort the results in descending order of years and within year , in descending order of GDP.
+
+    gdp <- nations %>% 
+  group_by(income, year) %>% 
+  summarize(total_gdp = sum(gdp_percap, na.rm = TRUE)) %>% 
+  arrange(desc(year), desc(total_gdp))
+  print(gdp)
+
+#e)Summarize the data by year , finding the maximum and minimum country-level life expectancy and the calculate the range of values.
+
+    n<-nations %>% filter(!is.na(life_expect)) %>% group_by(year) %>% summarize(countries=n(),maxi=max(life_expect),mini=min(life_expect)) %>% mutate(range_life=maxi-mini)
+    head(n,3)
+
+#f)Find total GDP, in trillions of dollars by region, over time
+
+    gdp_regions<-nations %>% mutate(gdp=(gdp_percap)/1000000000000) %>% group_by(region,year) %>% summarize(total_gdp = sum(gdp,na.rm=TRUE))
+    head(gdp_regions,5)
+
+#g)Join the nations to nations2 and calculate total CO2 in gigatonnes by region over time.
+
+    nations2<-read.csv("C:\\Users\\shara\\Desktop\\DS lab\\nations2.csv")
+
+    nations<-inner_join(nations,nations2)
+    head(nations,5)
+    # Check the data type of iso2c
+    class(nations$iso2c)
+
+    # Convert iso2c to numeric if it's not already numeric
+    nations$iso2c <- as.numeric(nations$iso2c)
+
+    # Now try summarizing again
+    df <- nations %>% 
+  group_by(region, year) %>%  
+  summarize(total_co2 = sum(iso2c, na.rm = TRUE))
+    head(df,5)
+
+titan<-read.csv("C:\\Users\\shara\\Desktop\\DS lab\\Titanic.csv")
+
+#Load the tiatanic dataset and 
+#a)Find out the number of misssing age values
+
+nrow(filter(titan,is.na(Age)))
+
+#b)Replace the misssing fare value with median fre of class/embarkment
+
+titan %>% filter(is.na(Fare))
+
+
+library(dplyr)
+library(tidyr)
+df<-titan %>% mutate(Fare=replace_na(Fare,mean(Fare,na.rm=TRUE)))
+head(df,5)
+
+#c)Extract surnames from the passenger names
+df1<-titan %>% extract(Name,c("Surname","Lastname"),"([^ ]+) (.*)")
+head(df1$Surname,5)
+
+#3)Write R command to modify any one value in above created myiris,csv file by opening it in excel and compare both (using compared,all_equal,identical commands).
+
+d1<-read.csv("C:\\Users\\shara\\Desktop\\DS lab\\iris.csv")
+d2<-read.csv("C:\\Users\\shara\\Desktop\\DS lab\\myiris.csv")
+all.equal(d1,d2)
+diff_rows <- setdiff(d1, d2)
+
+result <- all.equal(d1, d2)
+if (is.logical(result) && result) {
+  print("Data frames are equal.")
+} else {
+  print("Data frames are not equal.")
+}
+
+                              #Individual
+library(tidyverse)
+# Set random seed for reproducibility
+set.seed(123)
+engine_levels <- c("Petrol", "Diesel")
+day_descriptions <- c("Distance", "Fuel")
+# Create synthetic dataset
+synthetic_data <- tibble(
+  CarId = seq(1, 50),  # Generate Car IDs from 1 to 50
+  EngineType = factor(sample(engine_levels, 50, replace = TRUE), levels = engine_levels),
+  Day1 = sample(day_descriptions, 50, replace = TRUE),
+  Day2 = sample(day_descriptions, 50, replace = TRUE),
+  Day3 = sample(day_descriptions, 50, replace = TRUE),
+  Day4 = sample(day_descriptions, 50, replace = TRUE)
+)
+
+write.csv(synthetic_data, file = "synthetic_dataset.csv", row.names = FALSE)
+
+#1)Verify and make the dataset tidy
+library(tidyverse)
+synthetic_data <- read.csv("synthetic_dataset.csv")
+tidy_data <- synthetic_data %>%
+  gather(key = "Day", value = "Description", Day1:Day4)
+head(tidy_data,10)
+
+#2)Write tidy data to a CSV file
+write.csv(tidy_data, file = "tidy_synthetic_dataset.csv", row.names = FALSE)
+head(tidy_data,10)
+
+          # Batch-2 & 5:
+#1. File format: tab separated file
+#2. Create a new variable fuelPer100 (Fuel consumption per 100 KMs) and compute its value
+#3. Compute maximum and minimum fuelPer100 for every engine type
+
+library(tidyverse)
+# Load the synthetic dataset
+synthetic_data <- read.csv("synthetic_dataset.csv", sep = ",", stringsAsFactors = FALSE)
+# Select columns representing fuel consumption
+fuel_columns <- synthetic_data[, grepl("^Day[1-4]$", colnames(synthetic_data))]
+# Convert selected columns to numeric
+fuel_columns <- sapply(fuel_columns, as.numeric)
+# Calculate total fuel consumption for 100 kilometers
+total_fuel <- rowSums(fuel_columns, na.rm = TRUE)
+# Create a new variable fuelPer100 (Fuel consumption per 100 KMs)
+synthetic_data$fuelPer100 <- 100 / total_fuel
+head(synthetic_data$fuelPer100,10)
+# Compute maximum and minimum fuelPer100 for every engine type
+summary_data <- synthetic_data %>%
+  group_by(EngineType) %>%
+  summarise(max_fuelPer100 = max(fuelPer100, na.rm = TRUE),
+            min_fuelPer100 = min(fuelPer100, na.rm = TRUE))
+head(summary_data,10)
+# Write the results to a tab-separated file
+write.table(summary_data, file = "fuel_consumption_summary.tsv", sep = "\t", quote = FALSE, row.names = FALSE)
+
+
+
+
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
